@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>اپ دانشجو</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://unpkg.com/@simplewebauthn/browser@10/bundle/index.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif;
+      background: #f5f7fa; min-height: 100vh; padding: 16px; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .card { background: white; border-radius: 16px; padding: 20px;
+      margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    h1 { color: #00875a; font-size: 18px; margin-bottom: 14px; text-align: center; }
+    h2 { font-size: 15px; color: #00875a; margin-bottom: 8px; }
+    .user-bar { display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; color: #444; }
+    .btn { width: 100%; padding: 13px; font-size: 15px; border: none;
+      border-radius: 10px; font-weight: bold; cursor: pointer;
+      font-family: inherit; margin-top: 10px; }
+    .btn-primary { background: #00875a; color: white; }
+    .btn-link { padding: 6px 12px; font-size: 13px; color: #00875a;
+      text-decoration: none; background: #e6f4ee; border-radius: 8px;
+      border: none; cursor: pointer; font-family: inherit; margin-top: 8px; }
+    #reader { border-radius: 12px; overflow: hidden; margin: 14px 0; }
+    .status { text-align: center; padding: 14px; border-radius: 10px;
+      font-size: 15px; font-weight: bold; }
+    .status-success { background: #d4edda; color: #155724; }
+    .status-error   { background: #f8d7da; color: #721c24; }
+    .status-info    { background: #d1ecf1; color: #0c5460; }
+    .hidden { display: none !important; }
+    .courses { list-style: none; font-size: 14px; margin-top: 6px; }
+    .courses li { padding: 8px 10px; border-bottom: 1px solid #eee;
+      display: flex; justify-content: space-between; }
+    .courses li:last-child { border-bottom: none; }
+    .hint { font-size: 12px; color: #999; text-align: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="card">
+      <div class="user-bar">
+        <span>🎓 <b id="studentName">...</b></span>
+        <a href="/auth/logout" class="btn-link">خروج</a>
+      </div>
+    </div>
+
+    <div class="card" id="bioCard">
+      <h2>احراز هویت دستگاه</h2>
+      <div id="bioStatus" class="status status-info">در حال بررسی…</div>
+      <button id="bioRegisterBtn" class="btn btn-primary hidden" onclick="registerDevice()">📲 ثبت این دستگاه</button>
+      <button id="bioVerifyBtn" class="btn btn-primary hidden" onclick="verifyBio()">🖐️ تأیید با بیومتریک</button>
+      <button id="bioAddBtn" class="btn-link hidden" onclick="registerDevice()">+ ثبت دستگاه جدید</button>
+      <div class="hint">هویت شما با WebAuthn (اثر انگشت/PIN خودِ گوشی) تأیید و امضای آن سمت سرور بررسی می‌شود</div>
+    </div>
+
+    <div class="card">
+      <h1>اسکن QR استاد</h1>
+      <div id="reader"></div>
+      <div id="scanStatus" class="status status-info">—</div>
+      <div class="hint">پس از اسکن، هویت شما تأیید و حضورتان ثبت می‌شود</div>
+    </div>
+
+    <div class="card hidden" id="coursesCard">
+      <h2>درس‌های من</h2>
+      <ul class="courses" id="coursesList"></ul>
+    </div>
+
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let html5QrCode = null;
+let scanning = false, camStarted = false, retryCount = 0;
+let bioRequired = true, registered = false, bioFreshUntil = 0;
+
+function setStatus(msg, type = 'info') {
+  const el = $('scanStatus'); el.className = 'status status-' + type; el.textContent = msg;
+}
+function setBio(msg, type = 'info') {
+  const el = $('bioStatus'); el.className = 'status status-' + type; el.textContent = msg;
+}
+function show(id, on) { $(id).classList.toggle('hidden', !on); }
+function isFresh() { return bioFreshUntil > 0 && Date.now() < bioFreshUntil; }
+
+async function boot() {
+  try {
+    const meRes = await fetch('/api/student/me');
+    if (!meRes.ok) { window.location.href = '/auth/login'; return; }
+    const me = await meRes.json();
+    $('studentName').textContent = me.name || 'دانشجو';
+  } catch (e) { window.location.href = '/auth/login'; return; }
+
+  // درس‌ها (نمایشی)
+  try {
+    const cRes = await fetch('/api/student/courses');
+    if (cRes.ok) {
+      const courses = await cRes.json();
+      if (Array.isArray(courses) && courses.length) {
+        show('coursesCard', true);
+        $('coursesList').innerHTML = courses.map(c =>
+          `<li><span>${esc(c.name)}</span><span style="color:#999;font-size:12px;">${esc(c.term || '')}</span></li>`
+        ).join('');
+      }
+    }
+  } catch (e) {}
+
+  // وضعیت WebAuthn
+  let st = null;
+  try { st = await (await fetch('/api/webauthn/status')).json(); } catch (e) {}
+  bioRequired = st ? !!st.bio_required : true;
+  registered = st ? !!st.registered : false;
+  if (st && st.bio_fresh) bioFreshUntil = Date.now() + (st.window_seconds || 120) * 1000;
+
+  if (bioRequired && (!window.PublicKeyCredential || !window.SimpleWebAuthnBrowser)) {
+    setBio('مرورگر شما از WebAuthn پشتیبانی نمی‌کند (HTTPS و مرورگر به‌روز لازم است)', 'err');
+    return;
+  }
+  updateBioUI();
+}
+
+function updateBioUI() {
+  show('bioRegisterBtn', bioRequired && !registered);
+  show('bioVerifyBtn', bioRequired && registered && !isFresh());
+  show('bioAddBtn', bioRequired && registered);
+
+  if (!bioRequired) { setBio('حالت تست: بیومتریک اجباری نیست', 'info'); startScanning(); return; }
+  if (!registered) { setBio('برای استفاده، ابتدا این دستگاه را ثبت کن', 'info'); return; }
+  if (isFresh()) { setBio('دستگاه تأیید شده ✅ می‌توانی اسکن کنی', 'ok'); startScanning(); return; }
+  setBio('برای شروع اسکن، هویتت را با بیومتریک تأیید کن', 'info');
+}
+
+async function registerDevice() {
+  setBio('در حال ثبت دستگاه…', 'info');
+  try {
+    const optRes = await fetch('/api/webauthn/register/options', { method: 'POST' });
+    const options = await optRes.json();
+    if (!optRes.ok) throw new Error(options.error || 'options_failed');
+
+    const att = await SimpleWebAuthnBrowser.startRegistration({ optionsJSON: options });
+
+    const vr = await fetch('/api/webauthn/register/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(att),
+    });
+    const vj = await vr.json();
+    if (!vr.ok || !vj.ok) throw new Error(vj.error || 'verify_failed');
+
+    registered = true;
+    bioFreshUntil = Date.now() + (vj.fresh_seconds || 120) * 1000;
+    updateBioUI();
+  } catch (e) {
+    setBio('ثبت دستگاه ناموفق: ' + (e.message || e), 'err');
+    updateBioUI();
+  }
+}
+
+async function verifyBio() {
+  setBio('در حال تأیید هویت…', 'info');
+  try {
+    const optRes = await fetch('/api/webauthn/auth/options', { method: 'POST' });
+    const options = await optRes.json();
+    if (!optRes.ok) throw new Error(options.error || 'options_failed');
+
+    const assertion = await SimpleWebAuthnBrowser.startAuthentication({ optionsJSON: options });
+
+    const vr = await fetch('/api/webauthn/auth/verify', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(assertion),
+    });
+    const vj = await vr.json();
+    if (!vr.ok || !vj.ok) throw new Error(vj.error || 'verify_failed');
+
+    bioFreshUntil = Date.now() + (vj.fresh_seconds || 120) * 1000;
+    updateBioUI();
+    return true;
+  } catch (e) {
+    setBio('تأیید هویت ناموفق: ' + (e.message || e), 'err');
+    updateBioUI();
+    return false;
+  }
+}
+
+async function startScanning() {
+  if (camStarted) return;
+  camStarted = true; retryCount = 0;
+  html5QrCode = html5QrCode || new Html5Qrcode('reader');
+  try {
+    await html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 240, height: 240 } },
+      onScanSuccess, () => {}
+    );
+    scanning = true;
+    setStatus('دوربین رو به QR استاد بگیر', 'info');
+  } catch (e) {
+    camStarted = false;
+    setStatus('دسترسی به دوربین ممکن نشد: ' + (e && e.message ? e.message : e), 'error');
+  }
+}
+
+async function resumeScanning() {
+  try {
+    await html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 240, height: 240 } },
+      onScanSuccess, () => {}
+    );
+    scanning = true; camStarted = true; retryCount = 0;
+    setStatus('دوربین رو به QR استاد بگیر', 'info');
+  } catch (e) {
+    if (++retryCount < 5) setTimeout(resumeScanning, 1200);
+    else setStatus('دوربین دوباره روشن نشد؛ صفحه را رفرش کن', 'error');
+  }
+}
+
+function resumeFlow() {
+  if (bioRequired && !isFresh()) { updateBioUI(); return; } // دکمه تأیید را نشان بده
+  resumeScanning();
+}
+
+async function onScanSuccess(decodedText) {
+  if (!scanning) return;
+  scanning = false; camStarted = false;
+  try { await html5QrCode.stop(); } catch (e) {}
+
+  let qr;
+  try { qr = JSON.parse(decodedText); }
+  catch (e) { setStatus('QR نامعتبر است', 'error'); return setTimeout(resumeFlow, 2000); }
+
+  setStatus('در حال ثبت حضور…', 'info');
+
+  try {
+    const res = await fetch('/api/attendance/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ qr }),
+    });
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      setStatus(data.note === 'already_recorded' ? '✅ قبلاً ثبت شده بودی' : '✅ حضور شما ثبت شد', 'success');
+    } else {
+      const msgs = {
+        expired: 'QR منقضی شده؛ دوباره اسکن کن',
+        bad_signature: 'QR نامعتبر است',
+        malformed: 'QR نامعتبر است',
+        session_not_open: 'کلاس باز نیست',
+        not_enrolled: 'در این درس ثبت‌نام نداری',
+        biometric_required: 'اول هویتت را تأیید کن',
+        credential_bound_to_another_student: 'این دستگاه به دانشجوی دیگری تعلق دارد',
+        unauthorized: 'ابتدا وارد شو',
+      };
+      setStatus('❌ ' + (msgs[data.error] || data.error), 'error');
+    }
+  } catch (e) {
+    setStatus('خطای شبکه: ' + e.message, 'error');
+  }
+
+  setTimeout(resumeFlow, 2000);
+}
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>سیستم حضور و غیاب</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 20px;
+    }
+    .card {
+      background: white; border-radius: 20px; padding: 40px 30px;
+      max-width: 420px; width: 100%; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 { color: #1F4E79; font-size: 24px; margin-bottom: 8px; }
+    .sub { color: #666; font-size: 14px; margin-bottom: 40px; }
+    .btn {
+      display: block; width: 100%; padding: 18px;
+      font-size: 18px; border: none; border-radius: 12px;
+      text-decoration: none; color: white; font-weight: bold;
+      margin-bottom: 14px; cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-teacher { background: #1F4E79; }
+    .btn-student { background: #00875a; }
+    .icon { font-size: 32px; display: block; margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>سیستم حضور و غیاب</h1>
+    <p class="sub">QR پویا + بیومتریک</p>
+    <a href="/teacher" class="btn btn-teacher">
+      <span class="icon">👨‍🏫</span>
+      ورود استاد
+    </a>
+    <a href="/student" class="btn btn-student">
+      <span class="icon">🎓</span>
+      ورود دانشجو
+    </a>
+  </div>
+</body>
+</html>

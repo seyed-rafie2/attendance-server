@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>پنل استاد</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, 'Segoe UI', Tahoma, sans-serif;
+      background: #f5f7fa; min-height: 100vh; padding: 16px; }
+    .container { max-width: 520px; margin: 0 auto; }
+    .card { background: white; border-radius: 16px; padding: 20px;
+      margin-bottom: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    h2 { color: #1F4E79; font-size: 15px; margin-bottom: 10px; }
+    label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; }
+    select { width: 100%; padding: 13px; font-size: 16px; font-family: inherit;
+      border: 2px solid #e0e6ed; border-radius: 10px; margin-bottom: 12px; outline: none; }
+    select:focus { border-color: #1F4E79; }
+    .btn { width: 100%; padding: 15px; font-size: 16px; border: none;
+      border-radius: 10px; font-weight: bold; cursor: pointer;
+      font-family: inherit; transition: opacity .2s; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary { background: #1F4E79; color: white; }
+    .btn-danger { background: #c0392b; color: white; }
+    .btn-link { display: inline-block; padding: 8px 14px; font-size: 13px;
+      color: #1F4E79; text-decoration: none; background: #eef2f8;
+      border-radius: 8px; margin-top: 6px; }
+    .hidden { display: none !important; }
+    .user-bar { display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px; color: #444; }
+    #qrBox { text-align: center; padding: 14px; }
+    #qrBox canvas { max-width: 100%; }
+    #qrTimer { text-align: center; font-size: 13px; color: #666; margin-top: 6px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      text-align: center; margin-bottom: 12px; }
+    .stat { background: #f8f9fb; border-radius: 10px; padding: 12px; }
+    .stat-num { font-size: 26px; font-weight: bold; color: #00875a; }
+    .stat-num.red { color: #c0392b; }
+    .stat-label { font-size: 12px; color: #666; margin-top: 4px; }
+    .list { list-style: none; max-height: 220px; overflow-y: auto; }
+    .list li { padding: 9px 12px; border-bottom: 1px solid #eee;
+      display: flex; justify-content: space-between; font-size: 14px; }
+    .list li:last-child { border-bottom: none; }
+    .badge-ok { background: #d4edda; color: #155724; padding: 2px 9px;
+      border-radius: 20px; font-size: 11px; }
+    .badge-no { background: #f8d7da; color: #721c24; padding: 2px 9px;
+      border-radius: 20px; font-size: 11px; }
+    .empty { color: #999; text-align: center; padding: 12px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="card">
+      <div class="user-bar">
+        <span>👨‍🏫 <b id="teacherName">...</b></span>
+        <a href="/auth/logout" class="btn-link">خروج</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>شروع کلاس</h2>
+      <label>درس</label>
+      <select id="courseSelect"></select>
+      <button class="btn btn-primary" id="startBtn" onclick="startSession()">
+        ▶️ شروع حضور و غیاب
+      </button>
+    </div>
+
+    <div id="sessionCard" class="card hidden">
+      <h2>QR حضور <span id="courseName" style="font-size:13px;color:#666;"></span></h2>
+      <div id="qrBox"></div>
+      <div id="qrTimer"></div>
+    </div>
+
+    <div id="presentCard" class="card hidden">
+      <h2>وضعیت کلاس</h2>
+      <div class="grid">
+        <div class="stat"><div class="stat-num" id="presentCount">0</div>
+          <div class="stat-label">حاضر</div></div>
+        <div class="stat"><div class="stat-num red" id="absentCount">0</div>
+          <div class="stat-label">غایب</div></div>
+      </div>
+      <ul class="list" id="presentList"></ul>
+    </div>
+
+    <div id="closeCard" class="card hidden">
+      <button class="btn btn-danger" onclick="closeSession()">⏹️ پایان کلاس</button>
+    </div>
+
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let currentSession = null;
+let qrInterval = null, pollInterval = null, countdownTimer = null;
+let refreshingQR = false;
+
+async function boot() {
+  const meRes = await fetch('/api/teacher/me');
+  if (!meRes.ok) { window.location.href = '/auth/login'; return; }
+  const me = await meRes.json();
+  $('teacherName').textContent = me.name || 'استاد';
+
+  const cRes = await fetch('/api/teacher/courses');
+  if (!cRes.ok) { window.location.href = '/auth/login'; return; }
+  const courses = await cRes.json();
+
+  const sel = $('courseSelect');
+  if (!courses.length) {
+    sel.innerHTML = '<option value="">درسی در این ترم یافت نشد</option>';
+    $('startBtn').disabled = true;
+  } else {
+    sel.innerHTML = courses.map(c =>
+      `<option value="${esc(c.id)}">${esc(c.name)}${c.student_count ? ' — ' + c.student_count + ' نفر' : ''}</option>`
+    ).join('');
+  }
+}
+
+async function startSession() {
+  const courseId = $('courseSelect').value;
+  if (!courseId) return;
+  $('startBtn').disabled = true;
+
+  try {
+    const res = await fetch('/api/session/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ course_id: courseId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'خطا');
+
+    currentSession = data.session_id;
+    $('courseName').textContent = '— ' + (data.course_name || '');
+    $('sessionCard').classList.remove('hidden');
+    $('presentCard').classList.remove('hidden');
+    $('closeCard').classList.remove('hidden');
+
+    await refreshQR();
+    qrInterval = setInterval(refreshQR, (data.step_seconds || 10) * 1000);
+    pollInterval = setInterval(pollReport, 3000);
+    pollReport();
+  } catch (e) {
+    alert('خطا: ' + e.message);
+    $('startBtn').disabled = false;
+  }
+}
+
+async function refreshQR() {
+  if (!currentSession || refreshingQR) return; // جلوگیری از overlap
+  refreshingQR = true;
+  try {
+    const res = await fetch(`/api/session/${currentSession}/qr`);
+    const qr = await res.json();
+    if (!res.ok) throw new Error(qr.error || 'خطا');
+
+    const canvas = document.createElement('canvas');
+    await QRCode.toCanvas(canvas, JSON.stringify(qr), { width: 260, margin: 2 });
+    $('qrBox').innerHTML = '';
+    $('qrBox').appendChild(canvas);
+
+    // شمارش معکوس بر اساس expires_in سرور (مستقل از ساعت سرور/کلاینت)
+    clearInterval(countdownTimer);
+    const receivedAt = Date.now();
+    const total = Math.max(1, qr.expires_in);
+    const tick = () => {
+      const r = total - Math.floor((Date.now() - receivedAt) / 1000);
+      if (r <= 0) { $('qrTimer').textContent = 'در حال تازه‌سازی…'; clearInterval(countdownTimer); }
+      else $('qrTimer').textContent = `معتبر برای ${r} ثانیه`;
+    };
+    tick();
+    countdownTimer = setInterval(tick, 1000);
+  } catch (e) {
+    $('qrTimer').textContent = 'خطا: ' + e.message;
+  } finally {
+    refreshingQR = false;
+  }
+}
+
+async function pollReport() {
+  if (!currentSession) return;
+  try {
+    const res = await fetch(`/api/session/${currentSession}/report`);
+    const data = await res.json();
+    if (!res.ok) return;
+
+    $('presentCount').textContent = data.present_count;
+    $('absentCount').textContent = data.absent.length;
+
+    const present = data.present.map(p =>
+      `<li><span>${esc(p.name)}</span><span class="badge-ok">حاضر</span></li>`);
+    const absent = data.absent.map(a =>
+      `<li><span>${esc(a.name)}</span><span class="badge-no">غایب</span></li>`);
+    const all = present.concat(absent);
+    $('presentList').innerHTML = all.length
+      ? all.join('')
+      : '<li class="empty">هنوز کسی اسکن نکرده</li>';
+  } catch (e) {}
+}
+
+async function closeSession() {
+  if (!currentSession) return;
+  if (!confirm('کلاس تموم بشه؟')) return;
+  try {
+    await fetch(`/api/session/${currentSession}/close`, { method: 'POST' });
+  } catch (e) {}
+  clearInterval(qrInterval);
+  clearInterval(pollInterval);
+  clearInterval(countdownTimer);
+  $('qrBox').innerHTML = '<p style="color:#999;">کلاس پایان یافت — گزارش بالا نهایی است</p>';
+  $('qrTimer').textContent = '';
+  currentSession = null;
+  $('closeCard').classList.add('hidden');
+  $('startBtn').disabled = false;
+  pollReport(); // گزارش نهایی
+}
+
+boot();
+</script>
+</body>
+</html>
