@@ -643,17 +643,46 @@ app.use((err, _req, res, _next) => {
 
 /* ---------------- Start ---------------- */
 (async () => {
-  try {
-    await setupOIDC();
-    wa.setupWebAuthn();
-  } catch (e) {
-    console.error('❌ راه‌اندازی ناموفق:', e.message);
-    process.exit(1);
+  // retry — چون ممکن است IdP/API دانشگاه لحظه‌ی deploy در دسترس نباشد
+  const maxRetries = 5, delayMs = 5000;
+  let started = false;
+  for (let i = 1; i <= maxRetries && !started; i++) {
+    try {
+      await setupOIDC();
+      wa.setupWebAuthn();
+      started = true;
+    } catch (e) {
+      console.error(`❌ راه‌اندازی (تلاش ${i}/${maxRetries}):`, e.message);
+      if (i === maxRetries) { console.error('❌ راه‌اندازی ناموفق — خروج'); process.exit(1); }
+      await new Promise(r => setTimeout(r, delayMs));
+    }
   }
-  app.listen(PORT, '0.0.0.0', () => {
+
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server on port ${PORT}`);
     console.log(`   DB  : ${DB_FILE}`);
     console.log(`   SSO : ${process.env.OIDC_ISSUER}`);
     console.log(`   Uni : ${process.env.UNIVERSITY_API_BASE}`);
   });
+
+  // خطاهای async سرگردان، سرور را نمی‌اندازند
+  process.on('unhandledRejection', (r) => console.error('unhandledRejection:', r));
+
+  /* ---- Graceful shutdown ----
+   * Railway موقع stop/redeploy سیگنال SIGTERM می‌فرستد؛
+   * اینجا درخواست‌های جاری را تمام و دیتابیس را تمیز می‌بندیم.
+   */
+  let shuttingDown = false;
+  function shutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`${signal} دریافت شد — خاموشی تدریجی…`);
+    server.close(() => {
+      try { db.close(); console.log('🗄️ دیتابیس بسته شد'); } catch (e) { console.warn(e.message); }
+      process.exit(0);
+    });
+    setTimeout(() => process.exit(1), 10_000).unref();
+  }
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
 })();

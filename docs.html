@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📘 مستندات سیستم حضور و غیاب دانشگاهی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="hljsTheme">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --ink: #1e293b; --muted: #64748b;
+    --line: #e2e8f0; --primary: #1f4e79; --accent: #00875a;
+    --warn-bg: #fff7e6; --warn-bd: #f5c26b; --danger-bg: #fdecec; --danger-bd: #f1a3a3;
+    --tip-bg: #e8f7f0; --tip-bd: #7fd4ac;
+    --code-bg: #0f172a; --code-ink: #e2e8f0; --radius: 14px;
+    --shadow: 0 1px 3px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.06);
+  }
+  [data-theme="dark"] {
+    --bg: #0b1220; --card: #111a2e; --ink: #e2e8f0; --muted: #94a3b8;
+    --line: #233047; --primary: #6fa8dc; --accent: #34d399;
+    --warn-bg: #2d2410; --warn-bd: #8a6d1f; --danger-bg: #2d1518; --danger-bd: #8a3a3a;
+    --tip-bg: #0f2a1f; --tip-bd: #2e7d5b;
+    --code-bg: #0a0f1c; --code-ink: #dbe4f0;
+    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+  body {
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    background: var(--bg); color: var(--ink);
+    line-height: 1.9; font-size: 15.5px;
+    transition: background .3s, color .3s;
+  }
+  #progress { position: fixed; top: 0; right: 0; height: 3px; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--primary)); z-index: 99; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background: linear-gradient(135deg, #1f4e79 0%, #2d6da3 55%, #00875a 130%);
+    color: #fff; padding: 56px 20px 72px; text-align: center; position: relative;
+  }
+  .hero h1 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin-bottom: 10px; }
+  .hero p.sub { opacity: .85; font-size: 15px; }
+  .hero .badges { margin-top: 18px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .pill {
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3);
+    padding: 4px 14px; border-radius: 99px; font-size: 12.5px; backdrop-filter: blur(4px);
+  }
+  .hero-actions { margin-top: 22px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .hero-actions button {
+    font-family: inherit; cursor: pointer; font-size: 14px; font-weight: 600;
+    padding: 9px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,.4);
+    background: rgba(255,255,255,.12); color: #fff; transition: .2s;
+  }
+  .hero-actions button:hover { background: rgba(255,255,255,.25); }
+
+  /* ---------- Layout ---------- */
+  .layout { max-width: 1200px; margin: -44px auto 0; padding: 0 20px 80px;
+    display: grid; grid-template-columns: 260px 1fr; gap: 24px; align-items: start; }
+  nav.toc {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px; position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto;
+  }
+  nav.toc h3 { font-size: 13px; color: var(--muted); margin-bottom: 10px; font-weight: 600;
+    letter-spacing: .05em; }
+  nav.toc a { display: block; padding: 7px 12px; border-radius: 8px; font-size: 13.5px;
+    color: var(--muted); text-decoration: none; border-right: 3px solid transparent;
+    transition: .15s; margin-bottom: 2px; }
+  nav.toc a:hover { background: var(--bg); color: var(--ink); }
+  nav.toc a.active { background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary); border-right-color: var(--primary); font-weight: 600; }
+  .toc-toggle { display: none; }
+
+  main { min-width: 0; }
+  section.card {
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 30px 28px; margin-bottom: 22px; scroll-margin-top: 80px;
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+    padding-bottom: 14px; border-bottom: 2px solid var(--line); }
+  .sec-num {
+    width: 34px; height: 34px; flex-shrink: 0; border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 15px;
+  }
+  h2 { font-size: 20px; color: var(--primary); font-weight: 800; }
+  [data-theme="dark"] h2 { color: var(--primary); }
+  h3 { font-size: 16px; margin: 26px 0 12px; color: var(--ink); font-weight: 700;
+    display: flex; align-items: center; gap: 8px; }
+  h3::before { content: ''; width: 8px; height: 8px; border-radius: 3px; background: var(--accent); }
+  h4 { font-size: 14.5px; margin: 18px 0 8px; color: var(--primary); }
+  p { margin-bottom: 10px; }
+  ul.list, ol.list { padding-right: 22px; margin-bottom: 12px; }
+  ul.list li, ol.list li { margin-bottom: 6px; }
+  strong { color: var(--ink); }
+
+  /* ---------- Code ---------- */
+  code { font-family: 'Consolas', 'Menlo', monospace; font-size: .88em;
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    padding: 2px 7px; border-radius: 6px; direction: ltr; unicode-bidi: embed; color: var(--primary); }
+  [data-theme="dark"] code { color: #93c5fd; }
+  .code-block { margin: 14px 0 18px; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line); background: var(--code-bg); }
+  .code-head { display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,.05); padding: 7px 14px; direction: ltr; }
+  .code-lang { font-size: 11px; color: #94a3b8; font-family: monospace; text-transform: uppercase;
+    letter-spacing: .08em; }
+  .copy-btn { font-family: inherit; font-size: 11.5px; cursor: pointer; border: 1px solid #334155;
+    background: transparent; color: #94a3b8; border-radius: 6px; padding: 3px 12px; transition: .2s; }
+  .copy-btn:hover { color: #e2e8f0; border-color: #64748b; }
+  .copy-btn.done { color: #34d399; border-color: #34d399; }
+  pre { padding: 16px; overflow-x: auto; direction: ltr; text-align: left; }
+  pre code { background: none; padding: 0; color: var(--code-ink); font-size: 13px; line-height: 1.7; }
+  pre.diagram { font-size: 12px; line-height: 1.5; color: #7dd3fc; }
+
+  /* ---------- Tables ---------- */
+  .table-wrap { overflow-x: auto; margin: 12px 0 18px; border-radius: 12px;
+    border: 1px solid var(--line); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--card); }
+  thead th { background: color-mix(in srgb, var(--primary) 8%, transparent);
+    color: var(--primary); font-weight: 700; text-align: right; padding: 10px 14px;
+    border-bottom: 2px solid var(--line); white-space: nowrap; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: color-mix(in srgb, var(--primary) 4%, transparent); }
+
+  /* ---------- Callouts ---------- */
+  .callout { border-radius: 12px; padding: 14px 16px; margin: 14px 0; font-size: 14px;
+    border: 1px solid; display: flex; gap: 10px; align-items: flex-start; }
+  .callout .ic { font-size: 18px; line-height: 1.6; flex-shrink: 0; }
+  .callout.tip    { background: var(--tip-bg);    border-color: var(--tip-bd); }
+  .callout.warn   { background: var(--warn-bg);   border-color: var(--warn-bd); }
+  .callout.danger { background: var(--danger-bg); border-color: var(--danger-bd); }
+
+  /* ---------- Misc ---------- */
+  .method { font-family: monospace; font-size: 11.5px; font-weight: 700; padding: 2px 9px;
+    border-radius: 6px; direction: ltr; display: inline-block; }
+  .m-get { background: #dbeafe; color: #1d4ed8; }
+  .m-post { background: #dcfce7; color: #15803d; }
+  .m-401, .m-403 { background: #fee2e2; color: #b91c1c; }
+  .errcode { font-family: monospace; font-size: 12px; direction: ltr; unicode-bidi: embed; }
+  .flow { background: color-mix(in srgb, var(--accent) 6%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    border-radius: 12px; padding: 16px 18px; margin: 12px 0; }
+  .flow-title { font-weight: 700; color: var(--accent); margin-bottom: 8px; font-size: 14.5px; }
+  .flow ol { padding-right: 20px; font-size: 14px; }
+  .flow li { margin-bottom: 4px; }
+  .qa { margin-bottom: 16px; }
+  .qa .q { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+  .qa .q::before { content: '❓ '; }
+  .qa .a { font-size: 14px; padding-right: 4px; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding: 30px 20px 50px; }
+  #topBtn { position: fixed; bottom: 24px; left: 24px; width: 44px; height: 44px;
+    border-radius: 50%; border: none; background: var(--primary); color: #fff;
+    font-size: 18px; cursor: pointer; box-shadow: var(--shadow); opacity: 0;
+    pointer-events: none; transition: .3s; z-index: 50; }
+  #topBtn.show { opacity: 1; pointer-events: auto; }
+  a { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { position: fixed; top: 0; right: -300px; width: 280px; height: 100vh;
+      max-height: 100vh; border-radius: 0; z-index: 100; transition: right .3s; top: 0; margin: 0; }
+    nav.toc.open { right: 0; }
+    .toc-toggle { display: block; position: fixed; bottom: 24px; right: 24px; z-index: 90;
+      border: none; background: var(--accent); color: #fff; font-family: inherit;
+      font-weight: 700; padding: 12px 20px; border-radius: 99px; cursor: pointer;
+      box-shadow: var(--shadow); font-size: 14px; }
+    section.card { padding: 22px 18px; }
+  }
+  @media print {
+    nav.toc, .hero-actions, #topBtn, .toc-toggle, #progress, .copy-btn { display: none !important; }
+    .layout { grid-template-columns: 1fr; margin: 0; }
+    .hero { padding: 30px; }
+    body { background: #fff; }
+    section.card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <h1>📘 مستندات سیستم حضور و غیاب دانشگاهی</h1>
+  <p class="sub">ورود یکپارچه با SSO دانشگاه · QR پویا · بیومتریک WebAuthn · همگام‌سازی با API دانشگاه</p>
+  <div class="badges">
+    <span class="pill">📦 نسخه 2.1.0</span>
+    <span class="pill">🟢 Node.js ≥ 20</span>
+    <span class="pill">🔐 OIDC + PKCE</span>
+    <span class="pill">🗄️ SQLite WAL</span>
+    <span class="pill">🚂 Railway Ready</span>
+  </div>
+  <div class="hero-actions">
+    <button onclick="window.print()">🖨️ چاپ / PDF</button>
+    <button onclick="toggleTheme()" id="themeBtn">🌙 تم تیره</button>
+  </div>
+</header>
+
+<button class="toc-toggle" onclick="document.querySelector('nav.toc').classList.toggle('open')">☰ فهرست</button>
+
+<div class="layout">
+
+<!-- ═══════════ TOC ═══════════ -->
+<nav class="toc" id="toc">
+  <h3>📖 فهرست مطالب</h3>
+  <a href="#sec-1">۱. معرفی</a>
+  <a href="#sec-2">۲. معماری کلی</a>
+  <a href="#sec-3">۳. پیش‌نیازها</a>
+  <a href="#sec-4">۴. نصب و اجرای محلی</a>
+  <a href="#sec-5">۵. متغیرهای محیطی</a>
+  <a href="#sec-6">۶. مستندات API</a>
+  <a href="#sec-7">۷. جریان‌های کاربری</a>
+  <a href="#sec-8">۸. مدل امنیتی</a>
+  <a href="#sec-9">۹. ساختار دیتابیس</a>
+  <a href="#sec-10">۱۰. استقرار روی Railway</a>
+  <a href="#sec-11">۱۱. پیکربندی پیشرفته</a>
+  <a href="#sec-12">۱۲. عیب‌یابی</a>
+  <a href="#sec-13">۱۳. سؤالات متداول</a>
+</nav>
+
+<main>
+
+<!-- ═══════════ 1 ═══════════ -->
+<section class="card" id="sec-1">
+  <div class="sec-head"><div class="sec-num">۱</div><h2>معرفی</h2></div>
+  <p>سیستم حضور و غیاب هوشمند دانشگاهی که بر پایه‌ی <strong>SSO دانشگاه (OIDC)</strong>، <strong>API دانشگاه</strong> و <strong>QR پویا</strong> کار می‌کند. استاد جلسه می‌سازد و QR چرخان نمایش می‌دهد؛ دانشجو با اسکن و تأیید بیومتریک گوشی خود، حضورش ثبت می‌شود.</p>
+
+  <h3>قابلیت‌های اصلی</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>قابلیت</th><th>توضیح</th></tr></thead>
+    <tbody>
+      <tr><td>🔐 ورود یکپارچه</td><td>لاگین با اکانت دانشگاهی از طریق OIDC + PKCE — بدون رمز جداگانه</td></tr>
+      <tr><td>👥 تشخیص خودکار نقش</td><td>استاد یا دانشجو بودن از API دانشگاه مشخص می‌شود، نه از URL</td></tr>
+      <tr><td>🔄 همگام‌سازی خودکار</td><td>دروس، دانشجوها و اطلاعات افراد از API دانشگاه کش و sync می‌شوند</td></tr>
+      <tr><td>📱 QR پویا</td><td>QR هر ۱۰ ثانیه عوض می‌شود و با HMAC-SHA256 امضا می‌شود — عکس‌گرفتن QR بی‌فایده است</td></tr>
+      <tr><td>🖐️ بیومتریک واقعی</td><td>تأیید هویت با WebAuthn (اثر انگشت/FaceID/PIN خودِ گوشی) — verify سمت سرور</td></tr>
+      <tr><td>📲 اتصال دستگاه</td><td>هر دانشجو حداکثر N دستگاه ثبت‌شده دارد؛ جلوی حضور دادن تقلبی گرفته می‌شود</td></tr>
+      <tr><td>📊 گزارش زنده</td><td>استاد لحظه‌ای حاضر/غایب را می‌بیند و گزارش نهایی جلسه را می‌گیرد</td></tr>
+      <tr><td>🗄️ ذخیره‌سازی محلی</td><td>SQLite با WAL — سریع، بدون وابستگی به سرویس خارجی</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>تکنولوژی‌ها</h3>
+  <ul class="list">
+    <li><strong>Node.js ≥ 20</strong> + Express 4</li>
+    <li><code>openid-client v5</code> برای OIDC</li>
+    <li><code>@simplewebauthn/server v10</code> برای بیومتریک</li>
+    <li><code>better-sqlite3</code> برای دیتابیس</li>
+    <li><code>helmet</code> برای هدرهای امنیتی</li>
+  </ul>
+</section>
+
+<!-- ═══════════ 2 ═══════════ -->
+<section class="card" id="sec-2">
+  <div class="sec-head"><div class="sec-num">۲</div><h2>معماری کلی</h2></div>
+
+  <div class="code-block">
+    <div class="code-head"><span class="code-lang">architecture</span><button class="copy-btn">کپی</button></div>
+    <pre class="diagram"><code>┌─────────────┐      OIDC + PKCE       ┌──────────────┐
+│   مرورگر    │◄──────────────────────►│  SSO دانشگاه │
+│ (استاد/     │                         └──────────────┘
+│  دانشجو)    │      HTTPS + Cookie
+└──────┬──────┘◄───────────────────────┐
+       │                               │
+       ▼                               ▼
+┌─────────────────────────────────────────────┐
+│              attendance-server              │
+│  ┌──────────┐ ┌──────────┐ ┌─────────────┐  │
+│  │ auth.js  │ │ server.js│ │ webauthn.js │  │
+│  └────┬─────┘ └────┬─────┘ └─────────────┘  │
+│       │       ┌────┴─────┐                   │
+│       │       │university│                   │
+│       │       │   .js    │                   │
+│       │       └────┬─────┘                   │
+│  ┌────┴────────────┴────┐                    │
+│  │    SQLite (WAL)      │                    │
+│  └──────────────────────┘                    │
+└──────────────────────┬──────────────────────┘
+                       │ REST + API Key
+                       ▼
+              ┌─────────────────┐
+              │   API دانشگاه   │
+              └─────────────────┘</code></pre>
+  </div>
+
+  <h3>نقش فایل‌ها</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>فایل</th><th>مسئولیت</th></tr></thead>
+    <tbody>
+      <tr><td><code>server.js</code></td><td>سرور Express، مسیرها، منطق QR، دیتابیس</td></tr>
+      <tr><td><code>auth.js</code></td><td>ساخت URL ورود، پردازش callback OIDC، خروج</td></tr>
+      <tr><td><code>university.js</code></td><td>⚠️ <strong>تنها فایلی که شکل API دانشگاه را می‌شناسد</strong> — اگر API واقعی فرق داشت فقط اینجا را عوض کنید</td></tr>
+      <tr><td><code>webauthn.js</code></td><td>تولید options و verify کردن assertionهای بیومتریک</td></tr>
+      <tr><td><code>public/index.html</code></td><td>صفحه‌ی عمومی ورود</td></tr>
+      <tr><td><code>views/teacher.html</code></td><td>پنل استاد (پشت auth)</td></tr>
+      <tr><td><code>views/student.html</code></td><td>اپ دانشجو (پشت auth)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══════════ 3 ═══════════ -->
+<section class="card" id="sec-3">
+  <div class="sec-head"><div class="sec-num">۳</div><h2>پیش‌نیازها</h2></div>
+
+  <h3>از IT دانشگاه بگیرید</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>مورد</th><th>نمونه</th><th>کجا استفاده می‌شود</th></tr></thead>
+    <tbody>
+      <tr><td>۱</td><td>آدرس OIDC Issuer</td><td><code>https://sso.university.ac.ir</code></td><td><code>OIDC_ISSUER</code></td></tr>
+      <tr><td>۲</td><td>Client ID و Client Secret</td><td>—</td><td><code>OIDC_CLIENT_ID/SECRET</code></td></tr>
+      <tr><td>۳</td><td>ثبت Redirect URI در IdP</td><td><code>https://your-app.up.railway.app/auth/callback</code></td><td>—</td></tr>
+      <tr><td>۴</td><td>آدرس Base API دانشگاه</td><td><code>https://api.university.ac.ir/v1</code></td><td><code>UNIVERSITY_API_BASE</code></td></tr>
+      <tr><td>۵</td><td>API Key</td><td>—</td><td><code>UNIVERSITY_API_KEY</code></td></tr>
+      <tr><td>۶</td><td>مستندات API (نام فیلدها و مسیرها)</td><td>—</td><td>ویرایش <code>university.js</code></td></tr>
+      <tr><td>۷</td><td>*(اختیاری)* <code>post_logout_redirect_uri</code> در IdP</td><td>—</td><td>اگر <code>OIDC_RP_LOGOUT=true</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>روی سیستم شما</h3>
+  <ul class="list">
+    <li>Node.js نسخه‌ی ۲۰ یا بالاتر</li>
+    <li>Git</li>
+    <li>حساب Railway (برای deploy)</li>
+  </ul>
+</section>
+
+<!-- ═══════════ 4 ═══════════ -->
+<section class="card" id="sec-4">
+  <div class="sec-head"><div class="sec-num">۴</div><h2>نصب و اجرای محلی</h2></div>
+
+  <div class="code-block">
+    <div class="code-head"><span class="code-lang">cmd</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-batch">:: ۱. کلون و نصب
+cd C:\Users\Microsoft\attendance-server
+npm install
+
+:: ۲. ساخت فایل env محلی (ویندوز)
+notepad .env
+
+:: ۳. اجرا
+npm start
+:: سرور روی http://localhost:3000 بالا می‌آید</code></pre>
+  </div>
+
+  <p>محتوای <code>.env</code> برای تست محلی:</p>
+  <div class="code-block">
+    <div class="code-head"><span class="code-lang">env</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-ini">SESSION_SECRET=dev-secret-at-least-64-random-chars
+NODE_ENV=development
+OIDC_ISSUER=https://sso.university.ac.ir
+OIDC_CLIENT_ID=...
+OIDC_CLIENT_SECRET=...
+OIDC_REDIRECT_URI=http://localhost:3000/auth/callback
+UNIVERSITY_API_BASE=https://api.university.ac.ir/v1
+UNIVERSITY_API_KEY=...
+PUBLIC_ORIGIN=http://localhost:3000</code></pre>
+  </div>
+
+  <div class="callout warn"><span class="ic">⚠️</span><div><strong>توجه:</strong> WebAuthn فقط روی <strong>HTTPS</strong> یا <code>localhost</code> کار می‌کند.</div></div>
+
+  <h3>تست بدون SSO واقعی (اختیاری)</h3>
+  <p>برای توسعه‌ی محلی می‌توانید یک IdP آزمایشی مثل <strong>Keycloak</strong> با Docker بالا بیاورید، یا موقتاً <code>BIO_REQUIRED=false</code> بگذارید تا مرحله‌ی بیومتریک رد شود (فقط برای تست — در production حتماً <code>true</code>).</p>
+</section>
+
+<!-- ═══════════ 5 ═══════════ -->
+<section class="card" id="sec-5">
+  <div class="sec-head"><div class="sec-num">۵</div><h2>متغیرهای محیطی</h2></div>
+
+  <h3>الزامی</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>متغیر</th><th>توضیح</th><th>نمونه</th></tr></thead>
+    <tbody>
+      <tr><td><code>OIDC_ISSUER</code></td><td>آدرس Issuer دانشگاه (قابل discovery)</td><td class="errcode">https://sso.university.ac.ir</td></tr>
+      <tr><td><code>OIDC_CLIENT_ID</code></td><td>شناسه‌ی client ثبت‌شده در IdP</td><td class="errcode">attendance-app</td></tr>
+      <tr><td><code>OIDC_CLIENT_SECRET</code></td><td>رمز client</td><td>—</td></tr>
+      <tr><td><code>OIDC_REDIRECT_URI</code></td><td>آدرس callback — <strong>باید دقیقاً با ثبت در IdP یکی باشد</strong></td><td class="errcode">https://app.up.railway.app/auth/callback</td></tr>
+      <tr><td><code>SESSION_SECRET</code></td><td>رشته‌ی تصادفی ≥۶۴ کاراکتر</td><td class="errcode">openssl rand -hex 32</td></tr>
+      <tr><td><code>UNIVERSITY_API_BASE</code></td><td>آدرس پایه‌ی API دانشگاه</td><td class="errcode">https://api.university.ac.ir/v1</td></tr>
+      <tr><td><code>UNIVERSITY_API_KEY</code></td><td>کلید API</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>اختیاری</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>متغیر</th><th>پیش‌فرض</th><th>توضیح</th></tr></thead>
+    <tbody>
+      <tr><td><code>PORT</code></td><td>3000</td><td>پورت سرور (Railway خودش ست می‌کند)</td></tr>
+      <tr><td><code>NODE_ENV</code></td><td>—</td><td>در <code>production</code> کوکی‌ها Secure می‌شوند</td></tr>
+      <tr><td><code>PUBLIC_ORIGIN</code></td><td>از <code>OIDC_REDIRECT_URI</code></td><td>Origin اصلی سایت — برای WebAuthn لازم است</td></tr>
+      <tr><td><code>DB_FILE</code></td><td><code>./attendance.db</code></td><td>مسیر دیتابیس — روی Railway حتماً <code>/data/attendance.db</code></td></tr>
+      <tr><td><code>QR_STEP_SECONDS</code></td><td>10</td><td>هر چند ثانیه QR عوض شود</td></tr>
+      <tr><td><code>QR_TOLERANCE_SECONDS</code></td><td>8</td><td>تحمل اسکن در مرز دو QR</td></tr>
+      <tr><td><code>EXP_GRACE_SECONDS</code></td><td>3</td><td>مهلت اضافی سمت سرور برای تأخیر شبکه</td></tr>
+      <tr><td><code>SYNC_TTL</code></td><td>300</td><td>فاصله‌ی sync دروس (ثانیه)</td></tr>
+      <tr><td><code>BIO_REQUIRED</code></td><td>true</td><td>اگر <code>false</code>، بیومتریک اختیاری می‌شود (فقط تست!)</td></tr>
+      <tr><td><code>BIO_WINDOW_SECONDS</code></td><td>120</td><td>پس از تأیید بیومتریک، چند ثانیه حق اسکن دارد</td></tr>
+      <tr><td><code>MAX_CREDENTIALS</code></td><td>5</td><td>حداکثر دستگاه‌های ثبت‌شده per دانشجو</td></tr>
+      <tr><td><code>UNI_API_TIMEOUT_MS</code></td><td>8000</td><td>Timeout فراخوانی API دانشگاه</td></tr>
+      <tr><td><code>UNI_NOT_FOUND_STATUS</code></td><td>404</td><td>کدهای status که یعنی «پیدا نشد» (جدا با کاما)</td></tr>
+      <tr><td><code>CORS_ORIGIN</code></td><td>خالی</td><td>اگر فرانت جدا داشتید؛ خالی = هم‌مبلا</td></tr>
+      <tr><td><code>OIDC_RP_LOGOUT</code></td><td>false</td><td>اگر <code>true</code>، خروج، جلسه‌ی SSO را هم می‌بندد</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══════════ 6 ═══════════ -->
+<section class="card" id="sec-6">
+  <div class="sec-head"><div class="sec-num">۶</div><h2>مستندات API</h2></div>
+
+  <h3>مسیرهای احراز هویت</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>متد</th><th>مسیر</th><th>توضیح</th></tr></thead>
+    <tbody>
+      <tr><td><span class="method m-get">GET</span></td><td class="errcode">/auth/login</td><td>شروع ورود → ریدایرکت به SSO</td></tr>
+      <tr><td><span class="method m-get">GET</span></td><td class="errcode">/auth/callback</td><td>بازگشت از SSO → تعیین نقش → sync → ریدایرکت به پنل</td></tr>
+      <tr><td><span class="method m-get">GET</span></td><td class="errcode">/auth/logout</td><td>خروج (و اختیاری خروج از SSO)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>مسیرهای عمومی</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>متد</th><th>مسیر</th><th>پاسخ</th></tr></thead>
+    <tbody>
+      <tr><td><span class="method m-get">GET</span></td><td class="errcode">/health</td><td class="errcode">{ ok: true, time: 1712345678 }</td></tr>
+      <tr><td><span class="method m-get">GET</span></td><td class="errcode">/</td><td>صفحه‌ی ورود</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>مسیرهای استاد — نیازمند نقش <code>teacher</code></h3>
+
+  <h4><span class="method m-get">GET</span> <code>/api/teacher/me</code> — اطلاعات استاد جاری</h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">{ "id": "t123", "name": "دکتر احمدی", "email": "ahmadi@uni.ac.ir" }</code></pre></div>
+
+  <h4><span class="method m-get">GET</span> <code>/api/teacher/courses</code> — درس‌های استاد (کش ۵ دقیقه‌ای + sync خودکار)</h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">[ { "id": "c101", "name": "شبکه‌های کامپیوتری", "term": "1403-2", "student_count": 42 } ]</code></pre></div>
+
+  <h4><span class="method m-post">POST</span> <code>/api/session/start</code> — شروع جلسه‌ی حضور و غیاب</h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">request → response</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">// Body:
+{ "course_id": "c101" }
+
+// پاسخ:
+{
+  "session_id": "ses_a1b2c3d4e5f6",
+  "step_seconds": 10,
+  "tolerance_seconds": 8,
+  "started_at": 1712345678,
+  "course_name": "شبکه‌های کامپیوتری"
+}</code></pre></div>
+  <div class="callout tip"><span class="ic">🔒</span><div><code>secret</code> جلسه <strong>هرگز</strong> به کلاینت ارسال نمی‌شود.<br><strong>خطاها:</strong> <code>course_id_required</code> · <code>course_not_found</code></div></div>
+
+  <h4><span class="method m-get">GET</span> <code>/api/session/:sid/qr</code> — QR فعلیِ جلسه (هر بار متفاوت)</h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">{
+  "v": 1,
+  "sid": "ses_a1b2c3d4e5f6",
+  "exp": 1712345686,
+  "expires_in": 9,
+  "nonce": "aB3xY9...",
+  "sig": "kL2mN..."
+}</code></pre></div>
+  <div class="callout tip"><span class="ic">💡</span><div><code>expires_in</code> بر اساس ساعت <strong>سرور</strong> محاسبه شده؛ کلاینت از همین برای شمارش معکوس استفاده کند.</div></div>
+
+  <h4><span class="method m-post">POST</span> <code>/api/session/:sid/close</code> — پایان جلسه</h4>
+  <p>پاسخ: <code>{ "ok": true }</code></p>
+
+  <h4><span class="method m-get">GET</span> <code>/api/session/:sid/report</code> — گزارش کامل جلسه</h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">{
+  "session_id": "ses_...",
+  "course_id": "c101",
+  "status": "open",
+  "started_at": 1712345678,
+  "closed_at": null,
+  "total_enrolled": 42,
+  "present_count": 30,
+  "present": [ { "student_id": "s1", "name": "علی رضایی", "scanned_at": 1712345700 } ],
+  "absent":   [ { "id": "s2", "name": "سارا محمدی" } ]
+}</code></pre></div>
+
+  <h3>مسیرهای دانشجو — نیازمند نقش <code>student</code></h3>
+
+  <h4><span class="method m-get">GET</span> <code>/api/student/me</code></h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">{ "id": "s40211", "name": "علی رضایی", "email": "ali@stu.ac.ir" }</code></pre></div>
+
+  <h4><span class="method m-get">GET</span> <code>/api/student/courses</code> — اول از API دانشگاه، در صورت خطا از کش محلی</h4>
+  <div class="code-block"><div class="code-head"><span class="code-lang">json</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">[ { "id": "c101", "name": "شبکه‌های کامپیوتری", "term": "1403-2" } ]</code></pre></div>
+
+  <h4>WebAuthn</h4>
+  <div class="table-wrap"><table>
+    <thead><tr><th>متد</th><th>مسیر</th><th>توضیح</th></tr></thead>
+    <tbody>
+      <tr><td><span class="method m-get">GET</span></td><td class="errcode">/api/webauthn/status</td><td>وضعیت ثبت دستگاه و تازگی بیومتریک</td></tr>
+      <tr><td><span class="method m-post">POST</span></td><td class="errcode">/api/webauthn/register/options</td><td>گام ۱ ثبت دستگاه جدید</td></tr>
+      <tr><td><span class="method m-post">POST</span></td><td class="errcode">/api/webauthn/register/verify</td><td>گام ۲ — verify attestation</td></tr>
+      <tr><td><span class="method m-post">POST</span></td><td class="errcode">/api/webauthn/auth/options</td><td>گام ۱ تأیید هویت</td></tr>
+      <tr><td><span class="method m-post">POST</span></td><td class="errcode">/api/webauthn/auth/verify</td><td>گام ۲ — verify assertion</td></tr>
+    </tbody>
+  </table></div>
+  <div class="code-block"><div class="code-head"><span class="code-lang">status</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">{ "registered": true, "credentials": 2, "bio_required": true, "bio_fresh": false, "window_seconds": 120 }</code></pre></div>
+
+  <h4><span class="method m-post">POST</span> <code>/api/attendance/scan</code> — ثبت حضور</h4>
+  <div class="callout tip"><span class="ic">🖐️</span><div><strong>پیش‌نیاز:</strong> بیومتریک تازه (داخل <code>BIO_WINDOW_SECONDS</code>).</div></div>
+  <div class="code-block"><div class="code-head"><span class="code-lang">request → response</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-json">// Body:
+{ "qr": { "v": 1, "sid": "ses_...", "exp": 1712345686, "nonce": "...", "sig": "..." } }
+
+// پاسخ موفق:
+{ "ok": true, "status": "present" }
+// یا اگر قبلاً ثبت شده:
+{ "ok": true, "note": "already_recorded" }</code></pre></div>
+
+  <h4>خطاهای scan</h4>
+  <div class="table-wrap"><table>
+    <thead><tr><th>کد</th><th>HTTP</th><th>معنا</th></tr></thead>
+    <tbody>
+      <tr><td class="errcode">biometric_required</td><td><span class="method m-401">401</span></td><td>اول هویتت را تأیید کن</td></tr>
+      <tr><td class="errcode">qr_missing / malformed</td><td><span class="method m-401">400</span></td><td>QR خراب</td></tr>
+      <tr><td class="errcode">session_not_open</td><td><span class="method m-401">400</span></td><td>جلسه باز نیست</td></tr>
+      <tr><td class="errcode">bad_signature</td><td><span class="method m-401">400</span></td><td>QR جعلی/دستکاری‌شده</td></tr>
+      <tr><td class="errcode">expired</td><td><span class="method m-401">400</span></td><td>QR منقضی شده</td></tr>
+      <tr><td class="errcode">not_enrolled</td><td><span class="method m-403">403</span></td><td>در این درس ثبت‌نام نداری</td></tr>
+      <tr><td class="errcode">credential_bound_to_another_student</td><td><span class="method m-403">403</span></td><td>این دستگاه مال دانشجوی دیگری است</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout tip"><span class="ic">💡</span><div>همه‌ی مسیرهای <code>/api</code> هدر <code>Cache-Control: no-store</code> دارند و بدون کوکی نشست → <code>401</code>.</div></div>
+</section>
+
+<!-- ═══════════ 7 ═══════════ -->
+<section class="card" id="sec-7">
+  <div class="sec-head"><div class="sec-num">۷</div><h2>جریان‌های کاربری</h2></div>
+
+  <div class="flow">
+    <div class="flow-title">🧑‍🏫 جریان استاد</div>
+    <ol>
+      <li>صفحه اصلی → «ورود»</li>
+      <li>SSO دانشگاه → لاگین با اکانت دانشگاهی</li>
+      <li>برگشت به callback → سرور: <code>GET /teachers/{sub}</code> (نقش = teacher) سپس <code>GET /teachers/{id}/courses</code> (ذخیره دروس در DB)</li>
+      <li>ریدایرکت به <code>/teacher</code></li>
+      <li>انتخاب درس → «شروع حضور و غیاب» → <code>GET /courses/{id}/students</code> + ساخت session</li>
+      <li>نمایش QR پویا (هر ۱۰ ثانیه عوض می‌شود) + لیست زنده</li>
+      <li>«پایان کلاس» → جلسه بسته، گزارش نهایی</li>
+    </ol>
+  </div>
+
+  <div class="flow">
+    <div class="flow-title">🎓 دانشجو — بار اول</div>
+    <ol>
+      <li>ورود با SSO → تشخیص نقش student</li>
+      <li>پنل <code>/student</code> → کارت «احراز هویت دستگاه»</li>
+      <li>«ثبت این دستگاه» → اثر انگشت/PIN گوشی — کلید عمومی در سرور ذخیره می‌شود (فقط یک بار)</li>
+      <li>✅ دستگاه تأیید شد → دوربین روشن</li>
+    </ol>
+  </div>
+
+  <div class="flow">
+    <div class="flow-title">🎓 دانشجو — دفعات بعد</div>
+    <ol>
+      <li>ورود با SSO</li>
+      <li>«تأیید با بیومتریک» → پنجره‌ی ۱۲۰ ثانیه باز می‌شود</li>
+      <li>اسکن QR استاد → ثبت خودکار حضور</li>
+      <li>در پنل استاد، اسمش لحظه‌ای ظاهر می‌شود</li>
+    </ol>
+  </div>
+
+  <div class="callout warn"><span class="ic">📱</span><div><strong>گوشی عوض شد؟</strong> دکمه‌ی «+ ثبت دستگاه جدید» (تا سقف <code>MAX_CREDENTIALS</code>). دستگاه قبلی خودکار حذف نمی‌شود؛ در صورت نیاز ادمین باید رکورد مربوطه را از جدول <code>webauthn_credentials</code> پاک کند.</div></div>
+</section>
+
+<!-- ═══════════ 8 ═══════════ -->
+<section class="card" id="sec-8">
+  <div class="sec-head"><div class="sec-num">۸</div><h2>مدل امنیتی</h2></div>
+
+  <h3>لایه‌های احراز هویت</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>لایه</th><th>مکانیزم</th></tr></thead>
+    <tbody>
+      <tr><td>هویت</td><td>OIDC + Authorization Code + PKCE + <code>state</code> + <code>nonce</code></td></tr>
+      <tr><td>نقش</td><td>تشخیص از API دانشگاه — دست‌کاری URL بی‌اثر است. 404 (پیدا نشد) از خطای عمومی API (سرویس down) <strong>تفکیک</strong> می‌شود تا در قطعی API، هیچ‌کس اشتباهی رد یا بلاک نشود</td></tr>
+      <tr><td>نشست</td><td>کوکی <code>httpOnly</code> + <code>sameSite=lax</code> + <code>secure</code> در production + <code>session.regenerate</code> بعد از لاگین</td></tr>
+      <tr><td>QR</td><td>امضای HMAC-SHA256 با secret اختصاصی هر جلسه + nonce + انقضا + چک <code>timingSafeEqual</code> + type-check سخت‌گیرانه ورودی</td></tr>
+      <tr><td>بیومتریک</td><td>WebAuthn با <code>userVerification: required</code> — challenge از سرور، verify امضا و counter <strong>سمت سرور</strong>، پنجره‌ی زمانی ۱۲۰ ثانیه</td></tr>
+      <tr><td>دستگاه</td><td>اتصال <code>credential_id</code> به دانشجو + چک اینکه یک credential برای دو نفر حضور ثبت نکرده</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>جریان تقلبی‌های رایج و جلوی آن‌ها</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>تلاش برای تقلب</th><th>نتیجه</th></tr></thead>
+    <tbody>
+      <tr><td>عکس گرفتن از QR و ارسال برای دوست</td><td>❌ QR بعد از ۱۰ ثانیه منقضی می‌شود</td></tr>
+      <tr><td>ارسال <code>biometric: {ok:true}</code> جعلی با curl</td><td>❌ بیومتریک دیگر ادعای کلاینت نیست؛ assertion وب‌آتنِ verify‌شده سمت سرور لازم است</td></tr>
+      <tr><td>ارسال <code>device_id</code> کپی‌شده</td><td>❌ بر اساس <code>credential_id</code> (کلید داخل secure enclave) چک می‌شود</td></tr>
+      <tr><td>ساخت QR جعلی</td><td>❌ بدون secret جلسه امضای معتبر ممکن نیست</td></tr>
+      <tr><td>ورود به <code>/teacher</code> با URL</td><td>❌ نقش فقط از API دانشگاه؛ مسیر پنل‌ها هم پشت auth است</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>نکات استقرار</h3>
+  <ul class="list">
+    <li>HTTPS اجباری است (Railway خودکار).</li>
+    <li><code>SESSION_SECRET</code> ضعیف/ناموجود در production → سرور بالا نمی‌آید.</li>
+    <li>تعداد replica باید <strong>۱</strong> باشد (نشست در حافظه + SQLite).</li>
+    <li>پاسخ‌های QR کش نمی‌شوند (<code>no-store</code>).</li>
+  </ul>
+</section>
+
+<!-- ═══════════ 9 ═══════════ -->
+<section class="card" id="sec-9">
+  <div class="sec-head"><div class="sec-num">۹</div><h2>ساختار دیتابیس</h2></div>
+  <p>SQLite — فایل در <code>DB_FILE</code> — حالت WAL فعال.</p>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>جدول</th><th>ستون‌های کلیدی</th><th>توضیح</th></tr></thead>
+    <tbody>
+      <tr><td class="errcode">teachers</td><td><code>id</code> (PK), name, email, last_sync</td><td>کش اطلاعات استاد</td></tr>
+      <tr><td class="errcode">students</td><td><code>id</code> (PK), name, email, last_sync</td><td>کش اطلاعات دانشجو</td></tr>
+      <tr><td class="errcode">courses</td><td><code>id</code> (PK), teacher_id, term, student_count, last_sync</td><td>کش دروس</td></tr>
+      <tr><td class="errcode">enrollments</td><td>PK(course_id, student_id)</td><td>ثبت‌نام — <strong>فقط از API دانشگاه پر می‌شود</strong></td></tr>
+      <tr><td class="errcode">sessions</td><td><code>id</code> (PK), course_id, teacher_id, secret, status</td><td>جلسات حضور و غیاب</td></tr>
+      <tr><td class="errcode">attendance</td><td>PK(session_id, student_id), credential_id, scanned_at, qr_exp</td><td>رکوردهای حضور</td></tr>
+      <tr><td class="errcode">webauthn_credentials</td><td><code>credential_id</code> (PK), student_id, public_key, counter</td><td>کلیدهای عمومی دستگاه‌ها</td></tr>
+    </tbody>
+  </table></div>
+
+  <p><strong>ایندکس‌ها:</strong> <code>attendance(credential_id)</code> · <code>sessions(status)</code> · <code>courses(teacher_id)</code> · <code>enrollments(student_id)</code></p>
+  <p><strong>مهاجرت:</strong> دیتابیس‌های نسخه‌ی قبل (بدون <code>credential_id</code>) به‌صورت خودکار با <code>ALTER TABLE</code> ارتقا می‌یابند.</p>
+
+  <h3>کوئری‌های کاربردی ادمین</h3>
+  <div class="code-block"><div class="code-head"><span class="code-lang">sql</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-sql">-- گزارش حضور کل یک درس در همه جلسات
+SELECT s.name, COUNT(a.session_id) AS حضور
+FROM attendance a JOIN students s ON s.id=a.student_id
+JOIN sessions se ON se.id=a.session_id
+WHERE se.course_id='c101' GROUP BY s.id ORDER BY حضور DESC;
+
+-- حذف دستگاه گم‌شده‌ی یک دانشجو
+DELETE FROM webauthn_credentials WHERE student_id='s40211' AND credential_id='...';</code></pre></div>
+</section>
+
+<!-- ═══════════ 10 ═══════════ -->
+<section class="card" id="sec-10">
+  <div class="sec-head"><div class="sec-num">۱۰</div><h2>استقرار روی Railway</h2></div>
+
+  <h3>گام ۱ — اتصال ریپو</h3>
+  <ol class="list">
+    <li>ریپو را به GitHub پوش کنید.</li>
+    <li>در Railway: <strong>New Project → Deploy from GitHub repo</strong>.</li>
+  </ol>
+
+  <h3>گام ۲ — Volume (بسیار مهم!)</h3>
+  <div class="code-block"><div class="code-head"><span class="code-lang">settings</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-plaintext">Service → Settings → Volumes → Create
+Mount path: /data</code></pre></div>
+  <div class="callout danger"><span class="ic">❗</span><div>بدون Volume، دیتابیس <strong>با هر deploy پاک می‌شود</strong>.</div></div>
+
+  <h3>گام ۳ — متغیرها</h3>
+  <p>در تب Variables مقادیر بخش ۵ را وارد کنید. برای production:</p>
+  <div class="code-block"><div class="code-head"><span class="code-lang">env</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-ini">NODE_ENV=production
+DB_FILE=/data/attendance.db
+SESSION_SECRET=&lt;خروجی openssl rand -hex 32&gt;
+PUBLIC_ORIGIN=https://your-app.up.railway.app
+BIO_REQUIRED=true
+CORS_ORIGIN=</code></pre></div>
+
+  <h3>گام ۴ — تنظیمات IdP و ثبت دامنه</h3>
+  <ul class="list">
+    <li>دامنه‌ی Railway را generate کنید: Settings → Networking → Generate Domain</li>
+    <li>در IdP دانشگاه این Redirect URI را ثبت کنید:<br><code>https://your-app.up.railway.app/auth/callback</code></li>
+  </ul>
+
+  <h3>گام ۵ — محدودیت‌ها</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>محدودیت</th><th>دلیل</th><th>راه‌حل</th></tr></thead>
+    <tbody>
+      <tr><td>Replica = 1</td><td>نشست در حافظه + SQLite</td><td>بیشتر لازم نیست؛ بار کلاس‌ها سبک است</td></tr>
+      <tr><td>WebAuthn = فقط دامنه‌ی production</td><td>rpID به hostname وابسته است</td><td>لوکال فقط روی <code>localhost</code> تست کنید</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ═══════════ 11 ═══════════ -->
+<section class="card" id="sec-11">
+  <div class="sec-head"><div class="sec-num">۱۱</div><h2>پیکربندی پیشرفته</h2></div>
+
+  <h3>تنظیم حساسیت QR</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>سناریو</th><th>پیشنهاد</th></tr></thead>
+    <tbody>
+      <tr><td>کلاس عادی</td><td><code>QR_STEP_SECONDS=10</code>, <code>QR_TOLERANCE_SECONDS=8</code></td></tr>
+      <tr><td>اینترنت ضعیف دانشجوها</td><td><code>QR_STEP_SECONDS=15</code>, <code>QR_TOLERANCE_SECONDS=15</code></td></tr>
+      <tr><td>ضد تقلب سخت‌گیرانه</td><td><code>QR_STEP_SECONDS=5</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout tip"><span class="ic">💡</span><div>اسکن در مرز دو slot با <code>tolerance_seconds</code> پوشش داده می‌شود — مجموع step + tolerance را زیر ~۲۵ ثانیه نگه دارید تا پنجره‌ی تقلب کوتاه بماند.</div></div>
+
+  <h3>اگر مسیرهای API دانشگاه فرق داشت</h3>
+  <p>فقط <code>university.js</code> را ویرایش کنید:</p>
+  <div class="code-block"><div class="code-head"><span class="code-lang">javascript</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-javascript">// مثال: اگر API مسیر /api/v2/lessons/{id} داشت
+async function getTeacherCourses(id) {
+  return asList(await apiFetch(`/lessons/${encodeURIComponent(id)}?active=true`), 'data').map(normCourse);
+}</code></pre></div>
+  <p>لایه‌ی <code>normalize</code> (تابع‌های <code>normCourse</code>, <code>normPerson</code>, <code>asList</code>) تضمین می‌کند بقیه‌ی پروژه به شکل واقعی API وابسته نباشد.</p>
+
+  <h3>اگر IdP اسکوپ خاصی می‌خواهد</h3>
+  <div class="code-block"><div class="code-head"><span class="code-lang">auth.js</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-javascript">scope: 'openid profile email',  // ← طبق مستندات IdP تغییر دهید</code></pre></div>
+
+  <h3>خروج کامل از SSO</h3>
+  <div class="code-block"><div class="code-head"><span class="code-lang">env</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-ini">OIDC_RP_LOGOUT=true</code></pre></div>
+  <p>+ ثبت <code>https://your-app.up.railway.app</code> به‌عنوان <code>post_logout_redirect_uri</code> در IdP.</p>
+</section>
+
+<!-- ═══════════ 12 ═══════════ -->
+<section class="card" id="sec-12">
+  <div class="sec-head"><div class="sec-num">۱۲</div><h2>عیب‌یابی</h2></div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>علامت</th><th>علت محتمل</th><th>راه‌حل</th></tr></thead>
+    <tbody>
+      <tr><td>سرور بالا نمی‌آید: <code>OIDC discovery failed</code></td><td><code>OIDC_ISSUER</code> غلط یا IdP فایروال شده</td><td>آدرس را با <code>curl {ISSUER}/.well-known/openid-configuration</code> تست کنید</td></tr>
+      <tr><td><code>redirect_uri_mismatch</code> در صفحه‌ی SSO</td><td>URI ثبت‌شده در IdP با env یکی نیست</td><td>کاراکتر‌به‌کاراکتر چک کنید (http/https، trailing slash)</td></tr>
+      <tr><td>«نقش کاربری شما شناسایی نشد»</td><td>کاربر در هیچ‌کدام از endpoints موجود نیست</td><td>کاربر واقعاً استاد/دانشجو است؟ فیلد <code>sub</code> چه مقداری می‌دهد؟ با <code>GET /teachers/{sub}</code> دستی تست کنید</td></tr>
+      <tr><td>«API دانشگاه در دسترس نیست» هنگام ورود</td><td>API دانشگاه down یا API Key غلط</td><td><code>UNI_NOT_FOUND_STATUS</code> را چک کنید — اگر API «پیدا نشد» را با کد دیگری برمی‌گرداند اضافه کنید</td></tr>
+      <tr><td>QR می‌چرخد ولی دانشجو <code>expired</code> می‌گیرد</td><td>اختلاف ساعت شدید یا اینترنت خیلی کند</td><td><code>QR_TOLERANCE_SECONDS</code> و <code>EXP_GRACE_SECONDS</code> را زیاد کنید</td></tr>
+      <tr><td>«مرورگر شما از WebAuthn پشتیبانی نمی‌کند»</td><td>HTTP بدون localhost، یا مرورگر قدیمی</td><td>حتماً HTTPS؛ iOS ≥ 16، Chrome ≥ 90</td></tr>
+      <tr><td>بعد از deploy همه‌ی داده‌ها پاک شده</td><td>Volume وصل نیست</td><td>بخش ۱۰ گام ۲</td></tr>
+      <tr><td><code>502</code> گاه‌به‌گاه</td><td>حافظه یا restart توسط Railway</td><td>لاگ‌ها را ببینید؛ <code>restartPolicyMaxRetries</code> فعلاً کافی است</td></tr>
+      <tr><td>خطای ۵۰۰ در <code>/api/attendance/scan</code></td><td>ورودی خراب</td><td>الان type-check شده؛ اگر دیدیدید، لاگ سرور را بفرستید</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>بررسی سلامت سریع</h3>
+  <div class="code-block"><div class="code-head"><span class="code-lang">cmd</span><button class="copy-btn">کپی</button></div>
+    <pre><code class="language-batch">curl https://your-app.up.railway.app/health
+:: → {"ok":true,"time":1712345678}
+
+:: لاگ زنده
+railway logs</code></pre></div>
+</section>
+
+<!-- ═══════════ 13 ═══════════ -->
+<section class="card" id="sec-13">
+  <div class="sec-head"><div class="sec-num">۱۳</div><h2>سؤالات متداول</h2></div>
+
+  <div class="qa">
+    <div class="q">چرا دو دکمه‌ی «ورود استاد» و «ورود دانشجو» هر دو یک کار را می‌کنند؟</div>
+    <div class="a">نقش از API دانشگاه تشخیص داده می‌شود، نه انتخاب کاربر. دکمه‌ها فقط جنبه‌ی UI دارند.</div>
+  </div>
+  <div class="qa">
+    <div class="q">اگر دانشجو اینترنت قطع شود لحظه‌ی اسکن چه می‌شود؟</div>
+    <div class="a">حضور ثبت نمی‌شود؛ چند ثانیه بعد دوباره اسکن می‌کند (QR هر ۱۰ ثانیه معتبر است). می‌توانید <code>QR_TOLERANCE_SECONDS</code> را بالاتر ببرید.</div>
+  </div>
+  <div class="qa">
+    <div class="q">آیا می‌شود حضور قدیمی را دستی اصلاح کرد؟</div>
+    <div class="a">بله — مستقیم روی دیتابیس (بخش ۹، کوئری‌های ادمین). رابط مدیریتی جداگانه در نقشه‌ی راه است.</div>
+  </div>
+  <div class="qa">
+    <div class="q">دیتابیس کجاست و بکاپ چطور بگیرم؟</div>
+    <div class="a"><code>/data/attendance.db</code> روی Volume. از تب Files در Railway یا کوئری SQL خروجی بگیرید. WAL یعنی فایل‌های <code>-wal</code> و <code>-shm</code> کنارش هستند — برای بکاپ کامل هر سه را کپی کنید یا قبل از کپی <code>PRAGMA wal_checkpoint(TRUNCATE)</code> بزنید.</div>
+  </div>
+  <div class="qa">
+    <div class="q">آیا API دانشگاه هر بار که استاد صفحه را رفرش کند صدا زده می‌شود؟</div>
+    <div class="a">نه — کش TTL پنج‌دقیقه‌ای (<code>SYNC_TTL</code>) دارد.</div>
+  </div>
+  <div class="qa">
+    <div class="q">اگر دو استاد هم‌زمان کلاس داشته باشند تداخلی پیش می‌آید؟</div>
+    <div class="a">نه؛ هر جلسه <code>secret</code> و <code>id</code> مستقل دارد و دسترسی‌ها با <code>teacher_id</code> جدا شده‌اند.</div>
+  </div>
+
+  <h3>🗺️ نقشه‌ی راه (Roadmap)</h3>
+  <ul class="list">
+    <li>📊 گزارش Excel/PDF پایان ترم</li>
+    <li>🛠️ پنل ادمین برای مدیریت دستگاه‌ها و اصلاح دستی حضور</li>
+    <li>🔔 نوتیفیکیشن برای دانشجویان غایب</li>
+    <li>📅 پشتیبانی چند ترم هم‌زمان</li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<footer>
+  📘 مستندات سیستم حضور و غیاب دانشگاهی — نسخه 2.1.0<br>
+  <small>بازطراحی امنیتی بیومتریک (WebAuthn سمت سرور) · رفع مسیرهای پنل · تفکیک خطای API · مقاوم‌سازی QR</small>
+</footer>
+
+<button id="topBtn" onclick="window.scrollTo({top:0})">↑</button>
+
+<script>
+/* ---------- Theme ---------- */
+const themeBtn = document.getElementById('themeBtn');
+const hljsTheme = document.getElementById('hljsTheme');
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  themeBtn.textContent = t === 'dark' ? '☀️ تم روشن' : '🌙 تم تیره';
+  hljsTheme.href = t === 'dark'
+    ? 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css'
+    : 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css';
+  localStorage.setItem('docs-theme', t);
+}
+function toggleTheme() {
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+}
+applyTheme(localStorage.getItem('docs-theme') || 'light');
+
+/* ---------- Syntax highlight ---------- */
+if (window.hljs) hljs.highlightAll();
+
+/* ---------- Copy buttons ---------- */
+document.querySelectorAll('.copy-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const code = btn.closest('.code-block').querySelector('pre code');
+    const text = code.innerText;
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    btn.textContent = '✓ کپی شد'; btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'کپی'; btn.classList.remove('done'); }, 1800);
+  });
+});
+
+/* ---------- TOC active highlight ---------- */
+const tocLinks = document.querySelectorAll('nav.toc a');
+const sections = document.querySelectorAll('section.card');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(a => a.classList.toggle('active',
+        a.getAttribute('href') === '#' + e.target.id));
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => io.observe(s));
+tocLinks.forEach(a => a.addEventListener('click', () =>
+  document.querySelector('nav.toc').classList.remove('open')));
+
+/* ---------- Progress + back-to-top ---------- */
+const progress = document.getElementById('progress');
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progress.style.width = pct + '%';
+  topBtn.classList.toggle('show', h.scrollTop > 600);
+}, { passive: true });
+</script>
+</body>
+</html>
